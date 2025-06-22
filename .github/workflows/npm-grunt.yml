@@ -1,0 +1,56 @@
+name: NodeJS with Grunt
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Build
+      run: |
+        npm install
+        grunt
+            - 名称：上传构建工件
+  用途：actions/upload-artifact@v4.6.2
+  和：
+    # 工件名称
+    name: # 可选，默认为 artifact
+    # 描述要上传内容的文件、目录或通配符模式
+    小路：
+    # 如果使用提供的路径未找到任何文件，则需要采取以下行为。
+可用选项：
+  警告：输出警告但不会使操作失败
+  错误：操作失败并显示错误消息
+  忽略：不输出任何警告或错误，操作不会失败
+
+    if-no-files-found: # 可选，默认为警告
+    # 工件将在几天后过期。0 表示使用默认保留。
+最少 1 天。最长 90 天，除非从存储库设置页面进行更改。
+
+    保留天数：#可选
+    # Zlib 对 artifact 存档应用的压缩级别。该值的范围是 0 到 9：- 0：无压缩 - 1：最佳速度 - 6：默认压缩（与 GNU Gzip 相同） - 9：最佳压缩。级别越高，压缩效果越好，但完成时间也越长。对于不易压缩的大文件，建议使用 0 值，以获得更快的上传速度。
+
+    压缩级别：#可选，默认为6
+    # 如果为 true，则在上传新的工件之前，将删除名称匹配的工件。如果为 false，则如果指定名称的工件已存在，则操作将失败。如果工件不存在，则操作不会失败。
+
+    覆盖：#可选，默认为 false
+    # 如果为 true，隐藏文件将包含在 artifact 中。如果为 false，隐藏文件将从 artifact 中排除。
+
+    include-hidden-files: # 可选，默认为 false
+          
