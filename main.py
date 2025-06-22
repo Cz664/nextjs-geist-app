@@ -19,29 +19,6 @@ from urllib.parse import quote, unquote
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# API Configuration
-API_CONFIG = {
-    "licenselookup": {
-        "url": "https://api.licenselookup.org/usa-advanced-phone-search",
-        "token": "c075331473726f1395e915ec7d1bb67c"
-    },
-    "rapidapi": {
-        "key": "a9c563c006msh330f7a2f874b43ep1a9cb8jsn52d5c04e38cc",
-        "osint": {
-            "url": "https://osint-phone-email-names-search-everything.p.rapidapi.com/search",
-            "host": "osint-phone-email-names-search-everything.p.rapidapi.com"
-        }
-    }
-}
-
-# Target platforms list
-TARGET_PLATFORMS = [
-    "Facebook", "Instagram", "Twitter/X", "LinkedIn", "TikTok", "YouTube",
-    "Snapchat", "Reddit", "Discord", "Telegram", "WhatsApp",
-    "Cash App", "Venmo", "PayPal", "Zelle", "Apple Pay", "Google Pay", "Amazon Pay",
-    "Google Store", "Coinbase", "Crypto.com", "Kraken", "Charles Schwab",
-    "E*TRADE", "TD Ameritrade", "Webull", "Robinhood"
-]
 
 # Initialize FastAPI app
 app = FastAPI(
