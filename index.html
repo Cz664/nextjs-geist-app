@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赛博搜索</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Cyberpunk Theme Styles */
+        .neon-text {
+            color: #ff00ff;
+            text-shadow: 
+                0 0 5px #ff00ff,
+                0 0 10px #ff00ff,
+                0 0 20px #ff00ff,
+                0 0 40px #ff00ff;
+            animation: flicker 2s infinite alternate;
+            letter-spacing: 2px;
+        }
+
+        .neon-border {
+            border: 2px solid #00ffff;
+            box-shadow: 
+                0 0 5px #00ffff,
+                0 0 10px #00ffff,
+                0 0 15px #00ffff;
+            animation: borderPulse 4s infinite;
+            transition: all 0.3s ease;
+        }
+
+        .neon-border:focus {
+            border-color: #ff00ff;
+            box-shadow: 
+                0 0 5px #ff00ff,
+                0 0 10px #ff00ff,
+                0 0 15px #ff00ff;
+            outline: none;
+        }
+
+        .neon-glow {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .neon-glow::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 0%,
+                rgba(255, 0, 255, 0.1) 50%,
+                transparent 100%
+            );
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+            pointer-events: none;
+        }
+
+        .neon-glow:hover {
+            transform: scale(1.02);
+            text-shadow: 
+                0 0 5px currentColor,
+                0 0 10px currentColor,
+                0 0 20px currentColor;
+        }
+
+        .cyberpunk-card {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 
+                0 0 10px rgba(0, 255, 255, 0.2),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cyberpunk-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 0%,
+                rgba(0, 255, 255, 0.1) 50%,
+                transparent 100%
+            );
+            transform: rotate(45deg);
+            animation: shine 6s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes flicker {
+            0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% {
+                opacity: 0.99;
+                transform: scale(1);
+            }
+            20%, 21.999%, 63%, 63.999%, 65%, 69.999% {
+                opacity: 0.4;
+                transform: scale(0.98);
+            }
+        }
+
+        @keyframes borderPulse {
+            0%, 100% {
+                box-shadow: 
+                    0 0 5px #00ffff,
+                    0 0 10px #00ffff,
+                    0 0 15px #00ffff;
+            }
+            50% {
+                box-shadow: 
+                    0 0 10px #00ffff,
+                    0 0 20px #00ffff,
+                    0 0 30px #00ffff;
+            }
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-200%) translateY(-200%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(200%) translateY(200%) rotate(45deg);
+            }
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0) skew(0deg); }
+            20% { transform: translate(-2px, 2px) skew(2deg); }
+            40% { transform: translate(-2px, -2px) skew(-2deg); }
+            60% { transform: translate(2px, 2px) skew(2deg); }
+            80% { transform: translate(2px, -2px) skew(-2deg); }
+            100% { transform: translate(0) skew(0deg); }
+        }
+
+        .glitch {
+            animation: glitch 0.3s infinite;
+            color: #ff0033;
+            text-shadow: 
+                2px 2px #0ff,
+                -2px -2px #f0f;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        .scanline::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(
+                to right,
+                transparent,
+                #00ffff,
+                transparent
+            );
+            opacity: 0.1;
+            animation: scanline 2s linear infinite;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: #000000;
+            background-image: 
+                linear-gradient(45deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(-45deg, rgba(255, 0, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .suggestion-item {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(0, 255, 255, 0.1);
+            color: #ff00ff;
+            padding-left: 1.5rem;
+        }
+
+        .suggestion-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 0;
+            height: 2px;
+            background: #ff00ff;
+            transition: width 0.3s ease;
+            transform: translateY(-50%);
+        }
+
+        .suggestion-item:hover::before {
+            width: 1rem;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 640px) {
+            .neon-text {
+                font-size: 2rem;
+                letter-spacing: 1px;
+            }
+
+            .cyberpunk-card {
+                padding: 1rem;
+            }
+
+            .suggestion-item {
+                padding: 0.75rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: relative;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: linear-gradient(to right, #00ffff, #ff00ff);
+            animation: loading 1s infinite;
+        }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <main class="relative flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden">
+        <div class="absolute inset-0 scanline pointer-events-none"></div>
+        
+        <!-- Decorative Elements -->
+        <div class="absolute top-0 left-0 w-32 h-32 border-l-2 border-t-2 border-[#00ffff] opacity-30"></div>
+        <div class="absolute bottom-0 right-0 w-32 h-32 border-r-2 border-b-2 border-[#ff00ff] opacity-30"></div>
+        
+        <div class="w-full max-w-md space-y-8 z-10">
+            <div class="text-center space-y-4">
+                <h1 class="text-4xl md:text-5xl font-bold text-center neon-text mb-2 tracking-wider">
+                    赛博搜索
+                </h1>
+                <p class="text-[#00ffff] text-sm opacity-70">未来科技 · 搜索引擎</p>
+            </div>
+
+            <div id="error" class="text-red-500 text-center glitch mb-4 font-bold hidden"></div>
+
+            <div class="cyberpunk-card p-6 space-y-4">
+                <div class="flex gap-2">
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="输入搜索内容..."
+                        class="flex-1 bg-black/50 border-[#00ffff] text-white placeholder-[#00ffff]/50 focus:border-[#ff00ff] focus:ring-[#ff00ff] rounded-md neon-border p-2 outline-none"
+                    />
+                    <button
+                        onclick="handleVoiceSearch()"
+                        class="border border-[#00ffff] hover:bg-[#00ffff]/20 text-[#00ffff] neon-glow w-12 transition-all duration-300 rounded-md"
+                        style="background-color: rgba(0, 0, 0, 0.5)"
+                    >
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+
+                <button
+                    onclick="handleSearch()"
+                    id="searchButton"
+                    class="w-full bg-[#ff00ff] hover:bg-[#ff00ff]/80 text-white font-bold neon-glow transition-all duration-300 p-2 rounded-md"
+                >
+                    搜索
+                </button>
+
+                <div id="suggestions" class="mt-4 space-y-2 relative hidden">
+                    <div class="absolute -left-2 top-0 bottom-0 w-1 bg-gradient-to-b from-[#00ffff] via-transparent to-[#ff00ff] opacity-50"></div>
+                    <ul id="suggestionsList" class="space-y-2"></ul>
+                </div>
+            </div>
+
+            <footer class="text-center text-[#00ffff]/30 text-sm mt-8">
+                <p>赛博朋克风格搜索引擎 © 2077</p>
+            </footer>
+        </div>
+    </main>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const errorDiv = document.getElementById('error');
+        const suggestionsDiv = document.getElementById('suggestions');
+        const suggestionsList = document.getElementById('suggestionsList');
+
+        const dummySuggestions = [
+            "赛博朋克2077",
+            "赛博朋克边缘行者",
+            "赛博朋克风格",
+            "赛博朋克服装",
+            "赛博朋克城市",
+        ];
+
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            setTimeout(() => {
+                errorDiv.classList.add('hidden');
+            }, 3000);
+        }
+
+        async function handleSearch() {
+            const query = searchInput.value.trim();
+            if (!query) {
+                showError('请输入搜索内容');
+                return;
+            }
+
+            searchButton.textContent = '搜索中...';
+            searchButton.disabled = true;
+            searchButton.classList.add('loading');
+            
+            // 模拟搜索延迟
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            searchButton.textContent = '搜索';
+            searchButton.disabled = false;
+            searchButton.classList.remove('loading');
+            alert(`搜索: ${query}`);
+        }
+
+        function handleVoiceSearch() {
+            alert('语音搜索功能即将推出!');
+        }
+
+        function updateSuggestions() {
+            const query = searchInput.value.trim().toLowerCase();
+            if (!query) {
+                suggestionsDiv.classList.add('hidden');
+                return;
+            }
+
+            const filtered = dummySuggestions.filter(item => 
+                item.toLowerCase().includes(query)
+            );
+
+            if (filtered.length > 0) {
+                suggestionsList.innerHTML = filtered.map(suggestion => `
+                    <li class="suggestion-item p-2 cursor-pointer text-[#00ffff] rounded transition-colors"
+                        onclick="selectSuggestion('${suggestion}')">
+                        <i class="fas fa-search-plus mr-2 opacity-50"></i>
+                        ${suggestion}
+                    </li>
+                `).join('');
+                suggestionsDiv.classList.remove('hidden');
+            } else {
+                suggestionsDiv.classList.add('hidden');
+            }
+        }
+
+        function selectSuggestion(suggestion) {
+            searchInput.value = suggestion;
+            suggestionsDiv.classList.add('hidden');
+            searchInput.focus();
+        }
+
+        searchInput.addEventListener('input', updateSuggestions);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleSearch();
+            }
+        });
+
+        // Add some random glitch effects
+        setInterval(() => {
+            const title = document.querySelector('h1');
+            title.style.textShadow = Math.random() > 0.95 ? 
+                '2px 2px #0ff, -2px -2px #f0f' : 
+                '0 0 5px #ff00ff, 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 40px #ff00ff';
+        }, 100);
+    </script>
+</body>
+</html>
